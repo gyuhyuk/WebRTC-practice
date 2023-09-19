@@ -15,10 +15,13 @@ const server = http.createServer(app);
 
 const wss = new WebSocket.Server({ server });
 
-const handleConnection = (backSocket) => {
-  console.log(backSocket);
-};
-
-wss.on("connection", handleConnection);
+wss.on("connection", (backSocket) => {
+  console.log("Connected to Browser");
+  backSocket.on("close", () => console.log("Disconnected from the Browser"));
+  backSocket.on("message", (message) => {
+    console.log(message.toString("utf8"));
+  });
+  backSocket.send("wow!");
+});
 
 server.listen(3000, handleListen);
