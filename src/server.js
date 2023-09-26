@@ -23,12 +23,21 @@ const sockets = [];
 
 wss.on("connection", (backSocket) => {
   sockets.push(backSocket);
+  backSocket["nickname"] = "Anon";
   console.log("Connected to Browser");
   backSocket.on("close", onSocketClose);
-  backSocket.on("message", (message) => {
-    sockets.forEach(aSocket => aSocket.send(message.toString("utf-8")));
+  backSocket.on("message", (msg) => {
+    const message = JSON.parse(msg);
+    switch(message.type)
+    {
+      case "new_message":
+        sockets.forEach((aSocket) => aSocket.send(`${backSocket.nickname}: ${message.payload}`));
+        break
+      case "nickname":
+        backSocket["nickname"] = message.payload;
+      break
+    }
   });
 });
 
 server.listen(3000, handleListen);
-
